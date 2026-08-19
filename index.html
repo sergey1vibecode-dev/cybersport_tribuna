@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html class="dark" lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRIBUNA ESPORTS — Command Center</title>
+<meta name="description" content="Tribuna Esports Hub — live matches, team analytics, breaking news and the Aim Arena."/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="assets/js/tw-config.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<!-- Anton and Hanken Grotesk have no Cyrillic glyphs. Oswald (condensed display)
+     and Inter (grotesque body) carry the Ukrainian and Russian text so the
+     typography holds its shape in all three languages. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Oswald:wght@500;600&amp;family=Hanken+Grotesk:wght@400;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"/>
+<link rel="stylesheet" href="assets/css/apex.css"/>
+</head>
+
+<body class="font-body-md text-body-md">
+
+<div class="ambient-bg"></div>
+<div class="bg-glow"></div>
+
+<!-- ══════════════════════════════════════════════════════════ NAVIGATION -->
+<nav id="topnav" class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle transition-colors duration-300">
+  <div class="flex justify-between items-center max-w-container-max mx-auto px-6 md:px-margin-desktop h-20 gap-4">
+
+    <a href="#/home" data-route="#/home" class="font-headline-md text-[19px] sm:text-[26px] text-primary tracking-tighter hover:text-primary-fixed-dim transition-colors shrink-0">
+      TRIBUNA<span class="text-electric">.</span>ESPORTS
+    </a>
+
+    <div class="hidden lg:flex items-center gap-1">
+      <a href="#/home"  data-nav="home"  data-i18n="nav.home"  class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-primary px-4 py-2 rounded"></a>
+      <a href="#/live"  data-nav="live"  class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-primary px-4 py-2 rounded flex items-center gap-2">
+        <span data-i18n="nav.live"></span><span class="w-1.5 h-1.5 rounded-full bg-live live-pulse"></span>
+      </a>
+      <a href="#/teams" data-nav="teams" data-i18n="nav.teams" class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-primary px-4 py-2 rounded"></a>
+      <a href="#/news"  data-nav="news"  data-i18n="nav.news"  class="nav-link font-label-caps text-label-caps text-on-surface-variant hover:text-primary px-4 py-2 rounded"></a>
+      <a href="#/arena" data-nav="arena" class="nav-link font-label-caps text-label-caps text-primary-fixed-dim hover:text-primary px-4 py-2 rounded flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">stadia_controller</span><span data-i18n="nav.arena"></span>
+      </a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="search-wrap hidden md:block">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">search</span>
+        <input id="search-input" type="text" autocomplete="off" data-i18n-ph="common.search" data-i18n-aria="common.search"
+               class="bg-surface-charcoal border border-border-subtle rounded-full py-2 pl-10 pr-4 text-[14px] text-on-surface placeholder:text-outline focus:outline-none focus:border-electric focus:ring-1 focus:ring-electric w-44 xl:w-60 transition-colors"/>
+        <div id="search-results" class="search-results" hidden></div>
+      </div>
+
+      <div id="lang-switch" class="lang-switch" role="group" aria-label="Language"></div>
+
+      <button id="mobile-toggle" class="lg:hidden text-on-surface p-2" aria-label="Menu">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-nav" class="is-closed lg:hidden border-t border-border-subtle bg-void/95 backdrop-blur-xl px-6 py-4 flex flex-col gap-1">
+    <div class="search-wrap md:hidden mb-3">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">search</span>
+      <input id="search-input-mobile" type="text" autocomplete="off" data-i18n-ph="common.search" data-i18n-aria="common.search"
+             class="w-full bg-surface-charcoal border border-border-subtle rounded-full py-2.5 pl-10 pr-4 text-[14px] text-on-surface placeholder:text-outline focus:outline-none focus:border-electric transition-colors"/>
+      <div id="search-results-mobile" class="search-results" hidden></div>
+    </div>
+    <a href="#/home"  data-i18n="nav.home"  class="font-label-caps text-label-caps text-on-surface-variant py-3"></a>
+    <a href="#/live"  data-i18n="nav.live"  class="font-label-caps text-label-caps text-on-surface-variant py-3"></a>
+    <a href="#/teams" data-i18n="nav.teams" class="font-label-caps text-label-caps text-on-surface-variant py-3"></a>
+    <a href="#/news"  data-i18n="nav.news"  class="font-label-caps text-label-caps text-on-surface-variant py-3"></a>
+    <a href="#/arena" data-i18n="nav.arena" class="font-label-caps text-label-caps text-primary-fixed-dim py-3"></a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ HOME -->
+<section class="view is-active" data-view="home">
+
+  <div id="hero" class="relative w-full h-[86vh] min-h-[620px] max-h-[900px] overflow-hidden pt-20">
+    <canvas id="hero-shader" class="absolute inset-0 w-full h-full"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-void pointer-events-none"></div>
+    <div id="hero-track" class="absolute inset-0 pt-20"></div>
+
+    <div class="absolute bottom-10 left-0 right-0 z-20 pointer-events-none">
+      <div class="max-w-container-max mx-auto px-6 md:px-margin-desktop flex items-end justify-between gap-8">
+        <div id="hero-nav" class="flex gap-2 pointer-events-auto" role="tablist" aria-label="Featured events"></div>
+        <!-- Counter and arrows are desktop affordances; on touch the dots and
+             swipe gesture cover navigation without crowding the layout. -->
+        <div class="hidden md:flex items-center gap-6 pointer-events-auto">
+          <span id="hero-counter" class="font-stat-value text-[13px] text-on-surface-variant tracking-widest">01 / 04</span>
+          <div class="flex gap-2">
+            <button id="hero-prev" aria-label="Previous"
+                    class="w-11 h-11 rounded-full glass-panel flex items-center justify-center hover:border-electric hover:text-primary-fixed-dim transition-colors">
+              <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            </button>
+            <button id="hero-next" aria-label="Next"
+                    class="w-11 h-11 rounded-full glass-panel flex items-center justify-center hover:border-electric hover:text-primary-fixed-dim transition-colors">
+              <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full bg-surface-charcoal border-y border-border-subtle py-3 overflow-hidden relative z-10">
+    <div class="ticker-wrap flex items-center font-label-caps text-[12px]">
+      <div id="ticker" class="ticker"></div>
+    </div>
+  </div>
+
+  <main class="max-w-container-max mx-auto px-6 md:px-margin-desktop py-20 md:py-28 space-y-20 md:space-y-28">
+
+    <!-- Platform stats -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-gutter">
+      <div class="glass-panel clip-corner p-6 md:p-8 text-center hover-glow">
+        <div class="font-stat-value text-[clamp(24px,3vw,34px)] text-primary-fixed-dim" data-total-viewers>245,091</div>
+        <div class="font-label-caps text-[10px] text-on-surface-variant mt-2" data-i18n="home.watching"></div>
+      </div>
+      <div class="glass-panel clip-corner p-6 md:p-8 text-center hover-glow">
+        <div class="font-stat-value text-[clamp(24px,3vw,34px)] text-on-surface">1,284</div>
+        <div class="font-label-caps text-[10px] text-on-surface-variant mt-2" data-i18n="home.matches"></div>
+      </div>
+      <div class="glass-panel clip-corner p-6 md:p-8 text-center hover-glow">
+        <div class="font-stat-value text-[clamp(24px,3vw,34px)] text-on-surface">312</div>
+        <div class="font-label-caps text-[10px] text-on-surface-variant mt-2" data-i18n="home.teamsRanked"></div>
+      </div>
+      <div class="glass-panel clip-corner p-6 md:p-8 text-center hover-glow">
+        <div class="font-stat-value text-[clamp(24px,3vw,34px)] text-live">24/7</div>
+        <div class="font-label-caps text-[10px] text-on-surface-variant mt-2" data-i18n="home.coverage"></div>
+      </div>
+    </section>
+
+    <!-- Live now -->
+    <section class="reveal">
+      <div class="flex flex-wrap items-end justify-between gap-4 mb-gutter">
+        <div>
+          <div class="accent-rule mb-4"></div>
+          <h2 class="font-headline-lg text-[clamp(30px,4vw,48px)] text-on-surface flex items-center gap-4">
+            <span class="w-3.5 h-3.5 bg-live rounded-full live-pulse"></span><span data-i18n="home.liveNow"></span>
+          </h2>
+        </div>
+        <a href="#/live" data-route="#/live" class="font-label-caps text-label-caps text-primary-fixed-dim hover:text-white transition-colors flex items-center gap-1">
+          <span data-i18n="common.viewAll"></span><span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+      </div>
+      <div id="live-grid" class="stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"></div>
+    </section>
+
+    <!-- Analytics band -->
+    <section class="reveal grid lg:grid-cols-3 gap-gutter">
+      <div class="panel panel--hud p-6 md:p-8 lg:col-span-2">
+        <div class="hud-bracket tl"></div><div class="hud-bracket br"></div>
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-2">
+          <div>
+            <h2 class="font-headline-md text-[24px] text-on-surface" data-i18n="home.viewership"></h2>
+            <p class="font-body-md text-[13px] text-on-surface-variant mt-1" data-i18n="home.viewershipSub"></p>
+          </div>
+          <div class="flex gap-6">
+            <div class="text-right">
+              <div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="home.peak"></div>
+              <div id="viewership-peak" class="font-stat-value text-[18px] text-primary-fixed-dim mt-1">—</div>
+            </div>
+            <div class="text-right">
+              <div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="home.avg"></div>
+              <div id="viewership-avg" class="font-stat-value text-[18px] text-on-surface mt-1">—</div>
+            </div>
+            <div class="text-right">
+              <div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="home.growth"></div>
+              <div id="viewership-growth" class="font-stat-value text-[18px] text-live mt-1">—</div>
+            </div>
+          </div>
+        </div>
+        <div id="chart-viewership" class="mt-6" data-chart-host></div>
+      </div>
+
+      <div class="panel panel--hud p-6 md:p-8 flex flex-col">
+        <div class="hud-bracket tl"></div><div class="hud-bracket br"></div>
+        <h2 class="font-headline-md text-[24px] text-on-surface mb-6" data-i18n="home.prizeSplit"></h2>
+        <div id="chart-prize" class="flex-grow flex flex-col justify-center"></div>
+      </div>
+    </section>
+
+    <!-- Rankings + schedule -->
+    <section class="reveal grid lg:grid-cols-2 gap-gutter">
+      <div>
+        <div class="flex items-end justify-between mb-6">
+          <div>
+            <div class="accent-rule mb-3"></div>
+            <h2 class="font-headline-md text-[26px] text-on-surface" data-i18n="home.topRanked"></h2>
+          </div>
+          <a href="#/teams" data-route="#/teams" class="font-label-caps text-[11px] text-primary-fixed-dim hover:text-white transition-colors flex items-center gap-1">
+            <span data-i18n="common.viewAll"></span><span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </a>
+        </div>
+        <div id="top-ranked" class="panel p-2"></div>
+      </div>
+
+      <div>
+        <div class="flex items-end justify-between mb-6">
+          <div>
+            <div class="accent-rule mb-3"></div>
+            <h2 class="font-headline-md text-[26px] text-on-surface" data-i18n="home.schedule"></h2>
+          </div>
+          <a href="#/live" data-route="#/live" class="font-label-caps text-[11px] text-primary-fixed-dim hover:text-white transition-colors flex items-center gap-1">
+            <span data-i18n="common.viewAll"></span><span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </a>
+        </div>
+        <div id="home-schedule" class="stagger flex flex-col gap-3"></div>
+      </div>
+    </section>
+
+    <!-- Trending news -->
+    <section class="reveal">
+      <div class="flex items-end justify-between mb-6">
+        <div>
+          <div class="accent-rule mb-3"></div>
+          <h2 class="font-headline-md text-[26px] text-on-surface" data-i18n="home.trending"></h2>
+        </div>
+        <a href="#/news" data-route="#/news" class="font-label-caps text-[11px] text-primary-fixed-dim hover:text-white transition-colors flex items-center gap-1">
+          <span data-i18n="common.viewAll"></span><span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </a>
+      </div>
+      <div id="home-trending" class="stagger grid grid-cols-1 md:grid-cols-3 gap-gutter"></div>
+    </section>
+
+    <!-- Arena teaser -->
+    <section class="reveal">
+      <div class="relative rounded-xl overflow-hidden border border-border-subtle bg-surface-charcoal">
+        <div class="absolute inset-0 bg-cover bg-center opacity-25" style="background-image:url('assets/img/player-headset.jpg')"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-void via-void/85 to-transparent"></div>
+        <div class="hud-bracket tl"></div><div class="hud-bracket tr"></div>
+        <div class="hud-bracket bl"></div><div class="hud-bracket br"></div>
+
+        <div class="relative grid lg:grid-cols-2 gap-12 items-center p-8 md:p-16">
+          <div>
+            <span class="font-label-caps text-label-caps text-electric mb-4 block" data-i18n="arena.teaserKicker"></span>
+            <h2 class="font-headline-lg text-[clamp(28px,3.6vw,46px)] text-on-surface mb-6 uppercase max-w-md" data-i18n="arena.teaserTitle"></h2>
+            <p class="font-body-lg text-[17px] text-on-surface-variant mb-10 max-w-lg" data-i18n="arena.teaserLead"></p>
+            <div class="flex flex-wrap gap-4">
+              <button data-route="#/arena" class="btn-primary clip-corner font-label-caps text-label-caps px-8 py-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">stadia_controller</span><span data-i18n="arena.enter"></span>
+              </button>
+              <button data-route="#/live" data-i18n="arena.watchInstead" class="btn-secondary clip-corner font-label-caps text-label-caps px-8 py-4"></button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="stat-tile clip-corner-sm"><div class="stat-tile__label font-label-caps" data-i18n="arena.avgHuman"></div><div class="stat-tile__value font-stat-value text-[26px] mt-2">273 <span data-i18n="arena.ms"></span></div></div>
+            <div class="stat-tile clip-corner-sm"><div class="stat-tile__label font-label-caps" data-i18n="arena.tier1"></div><div class="stat-tile__value font-stat-value text-[26px] mt-2 text-live">150 <span data-i18n="arena.ms"></span></div></div>
+            <div class="stat-tile clip-corner-sm"><div class="stat-tile__label font-label-caps" data-i18n="arena.runLength"></div><div class="stat-tile__value font-stat-value text-[26px] mt-2">30 <span data-i18n="arena.sec"></span></div></div>
+            <div class="stat-tile clip-corner-sm"><div class="stat-tile__label font-label-caps" data-i18n="arena.ranksToClimb"></div><div class="stat-tile__value font-stat-value text-[26px] mt-2 text-primary-fixed-dim">5</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ LIVE -->
+<section class="view" data-view="live">
+  <main class="pt-32 pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto w-full grid grid-cols-12 gap-gutter">
+
+    <div class="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
+
+      <div class="relative w-full aspect-video bg-surface-charcoal rounded-xl overflow-hidden border border-border-subtle group">
+        <div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image:url('assets/img/player-headset.jpg')"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40"></div>
+
+        <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-start pointer-events-none">
+          <div class="flex items-center gap-4 glass-panel glass-gradient-border rounded-lg p-3">
+            <div class="flex items-center gap-3">
+              <span class="font-headline-md text-[24px] text-on-surface">NAVI</span>
+              <span id="live-round-a" class="font-stat-value text-stat-value text-primary-fixed-dim">13</span>
+            </div>
+            <span class="font-label-caps text-label-caps text-on-surface-variant px-2">-</span>
+            <div class="flex items-center gap-3">
+              <span id="live-round-b" class="font-stat-value text-stat-value text-primary-fixed-dim">11</span>
+              <span class="font-headline-md text-[24px] text-on-surface">FAZE</span>
+            </div>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            <div class="flex items-center gap-2 bg-live/20 border border-live/50 backdrop-blur-md px-3 py-1.5 rounded-full">
+              <div class="w-2 h-2 rounded-full bg-live animate-pulse-fast"></div>
+              <span class="font-label-caps text-[12px] text-secondary">LIVE</span>
+            </div>
+            <div class="glass-panel px-3 py-1.5 rounded-lg flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px] text-on-surface-variant">visibility</span>
+              <span class="font-stat-value text-[14px] text-on-surface" data-viewers="m1">112K</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent flex justify-between items-end">
+          <div class="glass-panel px-3 py-1.5 rounded flex items-center gap-2">
+            <span class="font-label-caps text-[12px] text-on-surface-variant">MAP 2</span>
+            <span class="font-label-caps text-[12px] text-primary-fixed-dim">MIRAGE</span>
+          </div>
+          <div class="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button aria-label="Settings" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:border-electric transition-colors">
+              <span class="material-symbols-outlined text-[20px] text-on-surface">settings</span>
+            </button>
+            <button aria-label="Fullscreen" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:border-electric transition-colors">
+              <span class="material-symbols-outlined text-[20px] text-on-surface">fullscreen</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+        <div class="glass-panel glass-gradient-border rounded-xl p-6 hover-glow">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-headline-md text-[24px] text-on-surface" data-i18n="live.odds"></h3>
+            <span class="font-label-caps text-[11px] text-primary-fixed-dim border border-primary/30 px-2 py-1 rounded bg-primary/10" data-i18n="live.bo3"></span>
+          </div>
+          <div class="flex items-center justify-between gap-4">
+            <button class="flex-1 bg-surface-charcoal border border-border-subtle rounded-lg p-4 hover:border-electric hover:cyber-glow transition-colors text-left">
+              <span class="block font-label-caps text-[12px] text-on-surface-variant mb-1">NAVI</span>
+              <span class="block font-stat-value text-[20px] text-primary-fixed-dim" data-odds>1.85</span>
+            </button>
+            <span class="font-headline-md text-[18px] text-on-surface-variant">VS</span>
+            <button class="flex-1 bg-surface-charcoal border border-border-subtle rounded-lg p-4 hover:border-electric hover:cyber-glow transition-colors text-right">
+              <span class="block font-label-caps text-[12px] text-on-surface-variant mb-1">FAZE</span>
+              <span class="block font-stat-value text-[20px] text-primary-fixed-dim" data-odds>2.10</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel glass-gradient-border rounded-xl p-6 flex flex-col justify-center">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-headline-md text-[24px] text-on-surface" data-i18n="live.upcoming"></h3>
+            <button class="font-label-caps text-[12px] text-primary-fixed-dim hover:text-white transition-colors flex items-center gap-1" data-route="#/home">
+              <span data-i18n="common.viewAll"></span><span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </button>
+          </div>
+          <div id="upcoming-list" class="flex flex-col gap-3"></div>
+        </div>
+      </div>
+
+      <div id="poll" class="glass-panel glass-gradient-border rounded-xl p-8 relative overflow-hidden">
+        <div class="hud-bracket tl"></div><div class="hud-bracket br"></div>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-2">
+          <h3 class="font-headline-md text-[24px] text-on-surface flex items-center gap-3">
+            <span class="material-symbols-outlined text-electric">how_to_vote</span><span data-i18n="live.whoWins"></span>
+          </h3>
+          <span class="font-label-caps text-[11px] text-on-surface-variant" data-poll-total></span>
+        </div>
+        <p class="font-body-md text-on-surface-variant mb-6" data-poll-hint data-i18n="live.pollHint"></p>
+        <p class="font-body-md text-primary-fixed-dim mb-6" data-poll-result data-i18n="live.pollLocked" hidden></p>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <button class="poll-option bg-surface-charcoal border border-border-subtle rounded-lg p-5 text-left" data-poll-option="a">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-headline-md text-[22px] text-on-surface">NATUS VINCERE</span>
+              <span class="font-stat-value text-[20px] text-primary-fixed-dim" data-poll-pct="a">54%</span>
+            </div>
+            <div class="poll-bar rounded-full"><div class="poll-bar__fill" data-poll-fill="a"></div></div>
+          </button>
+          <button class="poll-option bg-surface-charcoal border border-border-subtle rounded-lg p-5 text-left" data-poll-option="b">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-headline-md text-[22px] text-on-surface">FAZE CLAN</span>
+              <span class="font-stat-value text-[20px] text-secondary" data-poll-pct="b">46%</span>
+            </div>
+            <div class="poll-bar rounded-full"><div class="poll-bar__fill is-alt" data-poll-fill="b"></div></div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter lg:h-[860px]">
+      <div class="glass-panel glass-gradient-border rounded-xl p-4 flex-shrink-0">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-electric">bar_chart</span><span data-i18n="live.matchStats"></span>
+          </h3>
+          <div class="flex gap-3">
+            <button class="text-primary-fixed-dim font-stat-value text-[13px] border-b border-electric">NAVI</button>
+            <button class="text-on-surface-variant font-stat-value text-[13px] hover:text-on-surface transition-colors">FAZE</button>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-surface-charcoal border border-border-subtle flex items-center justify-center font-label-caps text-[10px]">so</div>
+              <span class="font-body-md text-[14px] text-on-surface">sokil</span>
+            </div>
+            <div class="flex gap-2 font-stat-value text-[14px]"><span class="text-primary-fixed-dim">24</span><span class="text-on-surface-variant">/</span><span class="text-error">12</span></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-surface-charcoal border border-border-subtle flex items-center justify-center font-label-caps text-[10px]">ar</div>
+              <span class="font-body-md text-[14px] text-on-surface">arcticz</span>
+            </div>
+            <div class="flex gap-2 font-stat-value text-[14px]"><span class="text-primary-fixed-dim">19</span><span class="text-on-surface-variant">/</span><span class="text-error">14</span></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-surface-charcoal border border-border-subtle flex items-center justify-center font-label-caps text-[10px]">n0</div>
+              <span class="font-body-md text-[14px] text-on-surface">n0vak</span>
+            </div>
+            <div class="flex gap-2 font-stat-value text-[14px]"><span class="text-primary-fixed-dim">16</span><span class="text-on-surface-variant">/</span><span class="text-error">15</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel glass-gradient-border rounded-xl flex flex-col flex-grow overflow-hidden min-h-[420px]">
+        <div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-charcoal/50">
+          <h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-electric">chat</span><span data-i18n="live.chat"></span>
+          </h3>
+          <span class="font-stat-value text-[12px] text-on-surface-variant flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">group</span>12.4k
+          </span>
+        </div>
+        <div id="chat-stream" class="flex-grow p-4 overflow-y-auto no-scrollbar space-y-2"></div>
+        <div class="p-4 bg-surface-charcoal border-t border-border-subtle">
+          <div class="relative">
+            <input id="chat-input" type="text" maxlength="140" data-i18n-ph="live.sendMessage" data-i18n-aria="live.sendMessage"
+                   class="w-full bg-void border border-border-subtle rounded-lg py-3 pl-4 pr-12 font-body-md text-[14px] text-on-surface placeholder:text-outline focus:outline-none focus:border-electric focus:ring-1 focus:ring-electric transition-colors"/>
+            <button id="chat-send" aria-label="Send" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary-fixed-dim hover:text-white transition-colors">
+              <span class="material-symbols-outlined symbol-fill">send</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════ TEAMS -->
+<section class="view" data-view="teams">
+  <main class="pt-32 pb-24 flex flex-col gap-20">
+
+    <section class="relative w-full max-w-container-max mx-auto px-6 md:px-margin-desktop">
+      <div class="relative w-full min-h-[460px] rounded-xl overflow-hidden border border-border-subtle bg-surface-charcoal">
+        <div class="absolute inset-0 bg-cover bg-center opacity-35" style="background-image:url('assets/img/stage-arena-main.jpg')"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-void via-surface-charcoal/85 to-transparent"></div>
+
+        <div class="relative z-10 flex flex-col justify-end p-8 md:p-margin-desktop min-h-[460px] lg:w-2/3">
+          <div class="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 w-max mb-6">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-[16px] symbol-fill">star</span>
+            <span class="font-label-caps text-[12px] text-primary-fixed-dim" data-i18n="teams.teamOfMonth"></span>
+          </div>
+          <h1 class="font-display-xl text-[clamp(36px,6vw,68px)] text-on-surface mb-6">TEAM SPIRIT</h1>
+          <button data-route="#/team/team-spirit" class="btn-primary clip-corner font-label-caps text-label-caps px-8 py-3.5 w-max flex items-center gap-2">
+            <span data-i18n="teams.viewTeam"></span><span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+
+        <div class="hidden lg:flex absolute right-margin-desktop top-1/2 -translate-y-1/2 z-10">
+          <div id="spirit-emblem" class="w-64 h-64 rounded-full glass-panel flex items-center justify-center shadow-[0_0_60px_rgba(168,85,247,0.18)]"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="w-full max-w-container-max mx-auto px-6 md:px-margin-desktop reveal">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-6">
+        <div>
+          <div class="accent-rule mb-4"></div>
+          <h2 class="font-headline-lg text-[clamp(30px,4vw,48px)] text-on-surface mb-6" data-i18n="teams.rankings"></h2>
+          <div id="teams-filters" class="flex flex-wrap gap-3">
+            <button data-filter="ALL"      class="difficulty-chip is-active font-label-caps text-[12px] px-6 py-2 rounded-chip" data-i18n="teams.allGames"></button>
+            <button data-filter="CS2"      class="difficulty-chip font-label-caps text-[12px] px-6 py-2 rounded-chip">CS2</button>
+            <button data-filter="DOTA 2"   class="difficulty-chip font-label-caps text-[12px] px-6 py-2 rounded-chip">DOTA 2</button>
+            <button data-filter="VALORANT" class="difficulty-chip font-label-caps text-[12px] px-6 py-2 rounded-chip">VALORANT</button>
+            <button data-filter="LOL"      class="difficulty-chip font-label-caps text-[12px] px-6 py-2 rounded-chip">LOL</button>
+            <button data-filter="PUBG"     class="difficulty-chip font-label-caps text-[12px] px-6 py-2 rounded-chip">PUBG</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="teams-grid" class="stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"></div>
+
+      <div class="flex justify-center mt-12">
+        <button data-i18n="teams.loadMore" class="btn-secondary clip-corner font-label-caps text-label-caps px-8 py-3"></button>
+      </div>
+    </section>
+  </main>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ TEAM PROFILE -->
+<section class="view" data-view="team">
+  <main id="team-detail" class="pt-32 pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto w-full"></main>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ NEWS -->
+<section class="view" data-view="news">
+  <main class="pt-32 pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto w-full">
+
+    <section class="mb-20">
+      <div id="news-hero-link" data-route="#/article/spirit-reverse-sweep"
+           class="relative w-full h-[520px] rounded-xl overflow-hidden group cursor-pointer border border-border-subtle glass-border-top">
+        <div id="news-hero" class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-void via-void/50 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full max-w-4xl z-10">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="bg-live text-black font-label-caps text-[12px] px-3 py-1 rounded-full live-pulse" data-i18n="news.breaking"></span>
+            <span id="news-hero-age" class="font-stat-value text-[13px] text-on-surface-variant"></span>
+          </div>
+          <h1 id="news-hero-title" class="font-display-xl text-[clamp(28px,4.6vw,64px)] text-on-surface mb-6 group-hover:text-primary-fixed-dim transition-colors"></h1>
+          <div class="flex items-center gap-6 text-on-surface-variant font-label-caps text-[12px]">
+            <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">chat_bubble</span><span id="news-hero-comments"></span></span>
+            <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">share</span><span data-i18n="common.share"></span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="flex flex-wrap justify-between items-end gap-4 mb-12 border-b border-border-subtle pb-4">
+        <h2 class="font-headline-lg text-[clamp(30px,4vw,48px)] text-on-surface" data-i18n="news.latest"></h2>
+        <div id="news-filters" class="flex flex-wrap gap-3 font-label-caps text-[12px]">
+          <button data-filter="ALL"       class="difficulty-chip is-active px-5 py-2 rounded-chip" data-i18n="news.all"></button>
+          <button data-filter="CS2"      class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.CS2"></button>
+          <button data-filter="DOTA 2"   class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.DOTA 2"></button>
+          <button data-filter="VALORANT" class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.VALORANT"></button>
+          <button data-filter="LOL"      class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.LOL"></button>
+          <button data-filter="PUBG"     class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.PUBG"></button>
+          <button data-filter="ІНШЕ"     class="difficulty-chip px-5 py-2 rounded-chip" data-i18n="cat.ІНШЕ"></button>
+        </div>
+      </div>
+
+      <div id="news-grid" class="stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"></div>
+
+      <div class="mt-12 flex justify-center">
+        <button data-i18n="news.loadMore" class="btn-secondary clip-corner font-label-caps text-label-caps px-8 py-3"></button>
+      </div>
+    </section>
+  </main>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════ ARTICLE -->
+<section class="view" data-view="article">
+  <main id="article-detail" class="pt-32 pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto w-full"></main>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════ ARENA -->
+<section class="view" data-view="arena">
+  <main id="arena" class="pt-32 pb-24 px-6 md:px-margin-desktop max-w-container-max mx-auto w-full">
+
+    <div class="mb-10">
+      <div class="accent-rule mb-4"></div>
+      <span class="font-label-caps text-label-caps text-electric mb-3 block" data-i18n="arena.kicker"></span>
+      <h1 class="font-display-xl text-[clamp(38px,6vw,68px)] text-on-surface uppercase mb-4">AIM ARENA</h1>
+      <p class="font-body-lg text-[clamp(15px,1.4vw,20px)] text-on-surface-variant max-w-2xl" data-i18n="arena.lead"></p>
+    </div>
+
+    <div class="glass-panel glass-gradient-border rounded-xl overflow-hidden">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 p-5 border-b border-border-subtle bg-void/40">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="font-label-caps text-[11px] text-on-surface-variant mr-1" data-i18n="arena.difficulty"></span>
+          <button data-difficulty="rookie" class="difficulty-chip font-label-caps text-[12px] px-5 py-2 rounded-chip">ROOKIE</button>
+          <button data-difficulty="pro"    class="difficulty-chip is-active font-label-caps text-[12px] px-5 py-2 rounded-chip">PRO</button>
+          <button data-difficulty="insane" class="difficulty-chip font-label-caps text-[12px] px-5 py-2 rounded-chip">INSANE</button>
+        </div>
+        <div class="flex items-center gap-5">
+          <div class="text-right">
+            <div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.personalBest"></div>
+            <div class="font-stat-value text-[15px] text-primary-fixed-dim" data-aim="best">—</div>
+          </div>
+          <button data-aim-action="mute" aria-pressed="false" aria-label="Sound"
+                  class="w-10 h-10 rounded-full border border-border-subtle flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-electric transition-colors">
+            <span class="material-symbols-outlined text-[20px]">volume_up</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 md:grid-cols-6 border-b border-border-subtle divide-x divide-white/5">
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.score"></div><div class="font-stat-value text-[22px] text-primary-fixed-dim mt-1" data-aim="score">0000</div></div>
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.time"></div><div class="font-stat-value text-[22px] text-on-surface mt-1" data-aim="time">30.0</div></div>
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.hits"></div><div class="font-stat-value text-[22px] text-on-surface mt-1" data-aim="hits">0</div></div>
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.accuracy"></div><div class="font-stat-value text-[22px] text-on-surface mt-1" data-aim="acc">100%</div></div>
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.headshot"></div><div class="font-stat-value text-[22px] text-live mt-1" data-aim="hs">0%</div></div>
+        <div class="p-4 text-center"><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.combo"></div><div class="font-stat-value text-[22px] text-primary-fixed-dim mt-1" data-aim="combo">x1</div></div>
+      </div>
+
+      <div class="timer-bar"><div class="timer-bar__fill" data-aim="bar"></div></div>
+
+      <div id="aim-frame" class="arena-frame aspect-[16/9] w-full">
+        <div class="hud-bracket tl"></div><div class="hud-bracket tr"></div>
+        <div class="hud-bracket bl"></div><div class="hud-bracket br"></div>
+        <canvas id="aim-canvas"></canvas>
+        <div id="aim-flash" class="arena-flash"></div>
+
+        <div id="aim-intro" class="arena-overlay">
+          <div class="text-center px-8">
+            <span class="material-symbols-outlined text-[52px] text-electric mb-4 block">my_location</span>
+            <h2 class="font-headline-lg text-[clamp(26px,3.4vw,44px)] text-on-surface mb-4 uppercase" data-i18n="arena.readyUp"></h2>
+            <p class="font-body-md text-on-surface-variant mb-8 max-w-md mx-auto" data-i18n="arena.readyLead"></p>
+            <button data-aim-action="start" data-i18n="arena.start" class="btn-primary clip-corner font-label-caps text-label-caps px-10 py-4 text-[15px]"></button>
+          </div>
+        </div>
+
+        <div id="aim-results" class="arena-overlay" hidden>
+          <div id="aim-results-inner" class="w-full max-w-2xl"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-gutter mt-gutter">
+      <div class="glass-panel glass-gradient-border rounded-xl p-8">
+        <h3 class="font-headline-md text-[26px] text-on-surface mb-2 flex items-center gap-3">
+          <span class="material-symbols-outlined text-electric">bolt</span><span data-i18n="arena.reaction"></span>
+        </h3>
+        <p class="font-body-md text-on-surface-variant mb-6" data-i18n="arena.reactionLead"></p>
+
+        <div id="reaction-pad" class="reaction-pad glass-panel clip-corner flex flex-col items-center justify-center h-56">
+          <span id="reaction-label" class="font-headline-md text-[30px] text-on-surface" data-i18n="arena.clickToStart"></span>
+          <span id="reaction-sub" class="font-body-md text-[14px] text-on-surface-variant mt-2 px-6 text-center"></span>
+        </div>
+
+        <div class="flex flex-wrap gap-6 justify-between items-center mt-6 pt-6 border-t border-border-subtle">
+          <div>
+            <div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.yourBest"></div>
+            <div id="reaction-best" class="font-stat-value text-[22px] text-primary-fixed-dim mt-1">—</div>
+          </div>
+          <div class="flex gap-6 text-right">
+            <div><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.proCs2"></div><div class="font-stat-value text-[16px] text-live mt-1">150 <span data-i18n="arena.ms"></span></div></div>
+            <div><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.avgGamer"></div><div class="font-stat-value text-[16px] text-on-surface mt-1">215 <span data-i18n="arena.ms"></span></div></div>
+            <div><div class="font-label-caps text-[10px] text-on-surface-variant" data-i18n="arena.avgHumanShort"></div><div class="font-stat-value text-[16px] text-on-surface-variant mt-1">273 <span data-i18n="arena.ms"></span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel glass-gradient-border rounded-xl p-8">
+        <h3 class="font-headline-md text-[26px] text-on-surface mb-6 flex items-center gap-3">
+          <span class="material-symbols-outlined text-electric">military_tech</span><span data-i18n="arena.rankLadder"></span>
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-4 rounded-lg bg-surface-charcoal border border-border-subtle">
+            <span class="font-headline-md text-[20px]" style="color:#968e99">ROOKIE</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant">0+</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg bg-surface-charcoal border border-border-subtle">
+            <span class="font-headline-md text-[20px]" style="color:#cdc3d0">CHALLENGER</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant">1 200+</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg bg-surface-charcoal border border-border-subtle">
+            <span class="font-headline-md text-[20px]" style="color:#ddb7ff">ELITE</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant">2 400+</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg bg-surface-charcoal border border-primary/40">
+            <span class="font-headline-md text-[20px]" style="color:#a855f7">PRO</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant">3 800+</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg bg-surface-charcoal border border-live/40">
+            <span class="font-headline-md text-[20px]" style="color:#ff6b00">APEX</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant">5 400+</span>
+          </div>
+        </div>
+        <p class="font-body-md text-[14px] text-on-surface-variant mt-6" data-i18n="arena.scaleNote"></p>
+      </div>
+    </div>
+  </main>
+</section>
+
+
+<!-- ═════════════════════════════════════════════════════════════ FOOTER -->
+<footer class="bg-surface-container-lowest w-full border-t border-border-subtle relative z-10">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter max-w-container-max mx-auto px-6 md:px-margin-desktop py-16">
+    <div class="col-span-1">
+      <div class="font-headline-md text-[24px] text-on-surface mb-4 tracking-tighter">TRIBUNA<span class="text-electric">.</span>ESPORTS</div>
+      <p class="font-body-md text-[13px] text-on-surface-variant" data-i18n="footer.rights"></p>
+    </div>
+    <div class="col-span-1 md:col-span-3 flex flex-wrap md:justify-end gap-x-10 gap-y-4 items-start">
+      <a href="#/home"  data-i18n="nav.home"  class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#/live"  data-i18n="nav.live"  class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#/teams" data-i18n="nav.teams" class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#/news"  data-i18n="nav.news"  class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#/arena" data-i18n="nav.arena" class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#" data-i18n="footer.terms"   class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+      <a href="#" data-i18n="footer.privacy" class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors"></a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/shader.js"></script>
+<script src="assets/js/hero.js"></script>
+<script src="assets/js/aim-trainer.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
