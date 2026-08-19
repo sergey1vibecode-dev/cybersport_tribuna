@@ -62,6 +62,15 @@
   const teamBySlug = slug => D.teams.filter(x => x.slug === slug)[0] || null;
   const newsById   = id   => D.news.filter(x => x.id === id)[0] || null;
 
+  /* True if `needle` (already lowercased) matches `gameCode`'s Latin tag OR
+     any of its known spellings, Cyrillic included — see D.disciplineAliases. */
+  function matchesDiscipline(gameCode, needle) {
+    if (!gameCode) return false;
+    if (gameCode.toLowerCase().indexOf(needle) !== -1) return true;
+    const aliases = (D.disciplineAliases || {})[gameCode] || [];
+    return aliases.some(a => a.indexOf(needle) !== -1);
+  }
+
   /* ====================================================================== */
   /*  Shared fragments                                                      */
   /* ====================================================================== */
@@ -329,6 +338,41 @@
         ${stat(t('team.streak'), tm.streak + ' ' + t('team.win'), 'text-live')}
       </div>
 
+      <!-- About + Upcoming: the two things a visitor actually came for,
+           so they sit right under the headline numbers instead of at the
+           bottom of a long scroll. -->
+      <div class="grid lg:grid-cols-2 gap-gutter mb-gutter">
+        <div class="panel p-6 md:p-8">
+          <h2 class="font-headline-md text-[22px] text-on-surface mb-4">${t('team.about')}</h2>
+          ${p(tm.about).map(par => `<p class="font-body-md text-[15px] leading-relaxed text-on-surface-variant mb-4">${par}</p>`).join('')}
+        </div>
+        <div>
+          <div class="mb-4 flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-live live-pulse"></span>
+            <h2 class="font-headline-md text-[22px] text-on-surface">${t('team.upcoming')}</h2>
+          </div>
+          <div class="flex flex-col gap-3">
+            ${tm.fixtures.map((f, i) => `
+              <div class="match-row">
+                <span class="text-center w-14">
+                  <span class="block font-label-caps text-[10px] text-on-surface-variant">${I18N.date(f.d, f.m)}</span>
+                  <span class="block font-stat-value text-[15px] text-primary-fixed-dim mt-1">${f.time}</span>
+                </span>
+                <span class="flex-1 min-w-0">
+                  <span class="block font-headline-md text-[18px] text-on-surface truncate">${esc(tm.name)} <span class="text-on-surface-variant text-[14px]">vs</span> ${esc(f.opp)}</span>
+                  <span class="block font-label-caps text-[10px] text-outline mt-1">${esc(f.event)}</span>
+                </span>
+                <button type="button" class="reminder-bell${window.Prefs && Prefs.isSet('team-fixture.' + tm.slug + '.' + i) ? ' is-armed' : ''}"
+                        data-remind="team-fixture.${tm.slug}.${i}"
+                        aria-label="${t('common.remind')}"
+                        aria-pressed="${window.Prefs && Prefs.isSet('team-fixture.' + tm.slug + '.' + i) ? 'true' : 'false'}">
+                  <span class="material-symbols-outlined text-[18px]">notifications</span>
+                </button>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
       <!-- Analytics -->
       <div class="mb-4 flex items-center gap-3">
         <div class="accent-rule"></div>
@@ -352,69 +396,39 @@
         </div>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-gutter mb-gutter">
-        <!-- Roster -->
-        <div class="panel lg:col-span-2 overflow-hidden">
-          <div class="flex items-center justify-between p-6 pb-4">
-            <h3 class="font-headline-md text-[20px] text-on-surface">${t('teams.roster')}</h3>
-            <span class="font-label-caps text-[11px] text-on-surface-variant">${t('team.coach')}: <span class="text-on-surface">${esc(tm.coach)}</span></span>
-          </div>
-          <div class="roster-row border-t border-border-subtle bg-white/[0.02]">
-            <span></span>
-            <span class="font-label-caps text-[10px] text-on-surface-variant">${t('team.player')}</span>
-            <span class="font-label-caps text-[10px] text-on-surface-variant">${t('team.role')}</span>
-            <span class="font-label-caps text-[10px] text-on-surface-variant text-right">${t('team.rating')}</span>
-            <span class="font-label-caps text-[10px] text-on-surface-variant text-right">${t('team.kd')}</span>
-          </div>
-          ${tm.roster.map(pl => `
-            <div class="roster-row">
-              ${tribunaEmblem(pl.nick.slice(0, 2).toUpperCase(), tm.tint, 34)}
-              <span class="font-body-md text-[15px] text-on-surface truncate">${esc(pl.nick)}</span>
-              <span class="font-label-caps text-[11px] text-on-surface-variant">${p(pl.role)}</span>
-              <span class="font-stat-value text-[14px] text-right ${pl.rating >= 1.15 ? 'text-primary-fixed-dim' : 'text-on-surface'}">${pl.rating.toFixed(2)}</span>
-              <span class="font-stat-value text-[14px] text-on-surface-variant text-right">${esc(pl.kd)}</span>
-            </div>`).join('')}
+      <!-- Roster -->
+      <div class="panel overflow-hidden mb-gutter">
+        <div class="flex items-center justify-between p-6 pb-4">
+          <h3 class="font-headline-md text-[20px] text-on-surface">${t('teams.roster')}</h3>
+          <span class="font-label-caps text-[11px] text-on-surface-variant">${t('team.coach')}: <span class="text-on-surface">${esc(tm.coach)}</span></span>
         </div>
-
-        <!-- Form + about -->
-        <div class="flex flex-col gap-gutter">
-          <div class="panel p-6">
-            <div class="flex items-baseline justify-between mb-4">
-              <h3 class="font-headline-md text-[20px] text-on-surface">${t('team.recentForm')}</h3>
-              <span class="font-stat-value text-[15px] text-primary-fixed-dim">${wins}-${10 - wins}</span>
-            </div>
-            <div id="team-form"></div>
-          </div>
-          <div class="panel p-6 flex-grow">
-            <h3 class="font-headline-md text-[20px] text-on-surface mb-4">${t('team.about')}</h3>
-            ${p(tm.about).map(par => `<p class="font-body-md text-[15px] leading-relaxed text-on-surface-variant mb-4">${par}</p>`).join('')}
-          </div>
+        <div class="roster-row border-t border-border-subtle bg-white/[0.02]">
+          <span></span>
+          <span class="font-label-caps text-[10px] text-on-surface-variant">${t('team.player')}</span>
+          <span class="font-label-caps text-[10px] text-on-surface-variant">${t('team.role')}</span>
+          <span class="font-label-caps text-[10px] text-on-surface-variant text-right">${t('team.rating')}</span>
+          <span class="font-label-caps text-[10px] text-on-surface-variant text-right">${t('team.kd')}</span>
         </div>
+        ${tm.roster.map(pl => `
+          <div class="roster-row">
+            ${tribunaEmblem(pl.nick.slice(0, 2).toUpperCase(), tm.tint, 34)}
+            <span class="font-body-md text-[15px] text-on-surface truncate">${esc(pl.nick)}</span>
+            <span class="font-label-caps text-[11px] text-on-surface-variant">${p(pl.role)}</span>
+            <span class="font-stat-value text-[14px] text-right ${pl.rating >= 1.15 ? 'text-primary-fixed-dim' : 'text-on-surface'}">${pl.rating.toFixed(2)}</span>
+            <span class="font-stat-value text-[14px] text-on-surface-variant text-right">${esc(pl.kd)}</span>
+          </div>`).join('')}
       </div>
 
-      <!-- Fixtures + results -->
-      <div class="grid lg:grid-cols-2 gap-gutter">
-        <div>
-          <div class="mb-4 flex items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-live live-pulse"></span>
-            <h3 class="font-headline-md text-[22px] text-on-surface">${t('team.upcoming')}</h3>
+      <!-- Recent form + results: retrospective, so it closes out the page. -->
+      <div class="grid lg:grid-cols-3 gap-gutter">
+        <div class="panel p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="font-headline-md text-[20px] text-on-surface">${t('team.recentForm')}</h3>
+            <span class="font-stat-value text-[15px] text-primary-fixed-dim">${wins}-${10 - wins}</span>
           </div>
-          <div class="flex flex-col gap-3">
-            ${tm.fixtures.map(f => `
-              <div class="match-row">
-                <span class="text-center w-14">
-                  <span class="block font-label-caps text-[10px] text-on-surface-variant">${I18N.date(f.d, f.m)}</span>
-                  <span class="block font-stat-value text-[15px] text-primary-fixed-dim mt-1">${f.time}</span>
-                </span>
-                <span class="flex-1 min-w-0">
-                  <span class="block font-headline-md text-[18px] text-on-surface truncate">${esc(tm.name)} <span class="text-on-surface-variant text-[14px]">vs</span> ${esc(f.opp)}</span>
-                  <span class="block font-label-caps text-[10px] text-outline mt-1">${esc(f.event)}</span>
-                </span>
-                <span class="material-symbols-outlined text-[18px] text-outline">notifications</span>
-              </div>`).join('')}
-          </div>
+          <div id="team-form"></div>
         </div>
-        <div>
+        <div class="lg:col-span-2">
           <div class="mb-4 flex items-center gap-3">
             <div class="accent-rule"></div>
             <h3 class="font-headline-md text-[22px] text-on-surface">${t('team.results')}</h3>
@@ -486,6 +500,12 @@
       $('#news-hero-age').textContent = p(b.age);
       $('#news-hero-comments').textContent = b.comments + ' ' + t('common.comments');
       $('#news-hero-link').dataset.route = '#/article/' + b.id;
+
+      const shareBtn = $('#news-hero-share');
+      if (shareBtn) {
+        shareBtn.dataset.shareUrl = location.origin + location.pathname + '#/article/' + b.id;
+        shareBtn.dataset.shareTitle = p(b.title);
+      }
     }
   }
 
@@ -504,6 +524,8 @@
     const paras = p(n.body);
     const mid = Math.ceil(paras.length / 2);
     const related = D.news.filter(x => x.id !== n.id).slice(0, 3);
+    const shareUrl = location.origin + location.pathname + '#/article/' + n.id;
+    const isSaved = window.Prefs && Prefs.isSet('saved.' + n.id);
 
     host.innerHTML = `
       <button data-route="#/news" class="font-label-caps text-[12px] text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 mb-8">
@@ -518,6 +540,9 @@
             ${catChip(n.cat, n.tone)}
             <span class="font-stat-value text-[12px] text-on-surface-variant">${p(n.age)}</span>
             <span class="font-label-caps text-[11px] text-outline">${n.read} ${t('news.minRead')}</span>
+            <button type="button" class="font-label-caps text-[11px] text-outline hover:text-primary transition-colors flex items-center gap-1" data-jump="#comments-section">
+              <span class="material-symbols-outlined text-[15px]">chat_bubble</span><span id="comments-count">${n.comments || 0}</span>
+            </button>
           </div>
           <h1 class="font-display-xl text-[clamp(28px,4.2vw,56px)] text-on-surface max-w-4xl">${p(n.title)}</h1>
         </div>
@@ -528,11 +553,25 @@
         ${n.quote ? `<blockquote class="article-quote font-body-lg">“${p(n.quote)}”</blockquote>` : ''}
         <p class="font-body-lg">${paras.slice(mid).join('</p><p class="font-body-lg">')}</p>
 
-        <div class="flex items-center gap-4 pt-8 mt-4 border-t border-border-subtle">
-          <span class="font-label-caps text-[11px] text-on-surface-variant">${t('common.share')}</span>
-          <span class="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-primary transition-colors cursor-pointer">share</span>
-          <span class="material-symbols-outlined text-[20px] text-on-surface-variant hover:text-primary transition-colors cursor-pointer">bookmark</span>
+        <div class="flex items-center gap-3 pt-8 mt-4 border-t border-border-subtle">
+          <button type="button" data-share data-share-url="${esc(shareUrl)}" data-share-title="${esc(p(n.title))}"
+                  class="font-label-caps text-[11px] text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">share</span>${t('common.share')}
+          </button>
+          <button type="button" data-bookmark="${n.id}" aria-pressed="${isSaved ? 'true' : 'false'}"
+                  class="bookmark-toggle font-label-caps text-[11px] text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2${isSaved ? ' is-saved' : ''}">
+            <span class="material-symbols-outlined text-[20px]">bookmark</span>${t('common.save')}
+          </button>
         </div>
+      </div>
+
+      <div id="comments-section" class="max-w-3xl mx-auto mt-20 pt-12 border-t border-border-subtle">
+        <h2 class="font-headline-md text-[22px] text-on-surface mb-6">${t('comments.title')} · <span id="comments-count-h">0</span></h2>
+        <form id="comment-form" class="comment-form mb-8">
+          <input id="comment-input" type="text" maxlength="500" placeholder="${t('comments.placeholder')}" autocomplete="off"/>
+          <button type="submit" aria-label="${t('comments.send')}"><span class="material-symbols-outlined text-[20px]">send</span></button>
+        </form>
+        <div id="comments-list"></div>
       </div>
 
       <div class="mt-24">
@@ -544,6 +583,9 @@
           ${related.map(newsCard).join('')}
         </div>
       </div>`;
+
+    renderComments(n.id);
+    initCommentForm(n.id);
   }
 
   /* ====================================================================== */
@@ -612,15 +654,16 @@
 
       const hit = hay => hay.toLowerCase().indexOf(needle) !== -1;
 
-      // Clubs are searchable by full name, tag, discipline, region and the
-      // short names people actually type ("navi", "наві", "prx").
+      // Clubs are searchable by full name, tag, discipline (Cyrillic spellings
+      // included — "лол"/"дота"/"пабг" all resolve), region and the short
+      // names people actually type ("navi", "наві", "prx").
       const teams = D.teams.filter(tm =>
-        hit(tm.name) || hit(tm.mark) || hit(tm.game) || hit(p(tm.region)) ||
+        hit(tm.name) || hit(tm.mark) || matchesDiscipline(tm.game, needle) || hit(p(tm.region)) ||
         (tm.alias || []).some(hit)
       ).slice(0, 5);
 
       const articles = D.news.filter(n =>
-        hit(p(n.title)) || hit(p(n.excerpt)) || hit(t('cat.' + n.cat))
+        hit(p(n.title)) || hit(p(n.excerpt)) || hit(t('cat.' + n.cat)) || matchesDiscipline(n.cat, needle)
       ).slice(0, 3);
 
       matches = teams.map(tm => ({ route: '#/team/' + tm.slug, tm }))
@@ -826,6 +869,166 @@
   /* ====================================================================== */
   /*  Reaction test                                                         */
   /* ====================================================================== */
+
+  /* ====================================================================== */
+  /*  Share / remind / bookmark — delegated, so markup anywhere can opt in   */
+  /*  just by carrying the right data- attribute.                           */
+  /* ====================================================================== */
+
+  function wireSocialActions() {
+    // Remind: toggles a persisted flag and repaints whichever button (or
+    // label span inside it) triggered the click.
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-remind]');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();   // these buttons often sit inside a [data-route] card
+
+      const armed = Prefs.toggle(btn.dataset.remind);
+      btn.classList.toggle('is-armed', armed);
+      btn.setAttribute('aria-pressed', String(armed));
+      const label = btn.querySelector('[data-remind-label]');
+      if (label) label.textContent = armed ? t('common.reminderSet') : t('common.remind');
+
+      Toast.show(armed ? t('common.reminderSet') : t('common.reminderOff'), { icon: 'bell' });
+    });
+
+    // Share: the Web Share API when the platform offers it (gives the visitor
+    // their OS's own share sheet — Messages, mail, whatever they'd pick), a
+    // clipboard copy otherwise. Either way it shares a real, working link to
+    // the exact article, not the page the button happens to sit on.
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-share]');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const url = btn.dataset.shareUrl || location.href;
+      const title = btn.dataset.shareTitle || document.title;
+
+      if (navigator.share) {
+        navigator.share({ title, url }).catch(() => { /* user cancelled — not an error */ });
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url)
+          .then(() => Toast.show(t('common.linkCopied'), { icon: 'link' }))
+          .catch(() => Toast.show(t('common.linkCopied'), { icon: 'link' }));
+      } else {
+        Toast.show(t('common.linkCopied'), { icon: 'link' });
+      }
+    });
+
+    // Bookmark: same persisted-flag pattern as remind, its own key namespace.
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-bookmark]');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const saved = Prefs.toggle('saved.' + btn.dataset.bookmark);
+      btn.classList.toggle('is-saved', saved);
+      btn.setAttribute('aria-pressed', String(saved));
+      Toast.show(saved ? t('common.saved') : t('common.unsaved'), { icon: 'bookmark' });
+    });
+
+    // A comment count is a promise ("there's a conversation here") — make it
+    // keep that promise by jumping to the thread instead of sitting inert.
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-jump]');
+      if (!btn) return;
+      const target = document.querySelector(btn.dataset.jump);
+      if (!target) return;
+      e.preventDefault();
+      e.stopPropagation();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  /* ====================================================================== */
+  /*  Comments — seeded deterministically per article, visitor's own         */
+  /*  comments persisted locally and appended on top. Same "real but scoped  */
+  /*  to this browser" honesty as the stream chat and the pick'em poll.      */
+  /* ====================================================================== */
+
+  function seedComments(articleId, count) {
+    // A stable hash of the id so the same article always shows the same seed
+    // set (and picks) across reloads, without storing anything for it.
+    let h = 0;
+    for (let i = 0; i < articleId.length; i++) h = (h * 31 + articleId.charCodeAt(i)) >>> 0;
+
+    const names = D.commenters;
+    const lines = p(D.commentLines);
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const name = names[(h + i * 7) % names.length];
+      const line = lines[(h + i * 13) % lines.length];
+      const hoursAgo = 1 + ((h >> (i + 2)) % 20);
+      out.push({ name, text: line, age: hoursAgo });
+    }
+    return out;
+  }
+
+  function loadOwnComments(articleId) {
+    try {
+      const raw = localStorage.getItem('tribuna.comments.' + articleId);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function saveOwnComments(articleId, list) {
+    try { localStorage.setItem('tribuna.comments.' + articleId, JSON.stringify(list)); } catch (e) { /* private mode */ }
+  }
+
+  function renderComments(articleId) {
+    const host = $('#comments-list');
+    const countEl = $('#comments-count-h');
+    if (!host) return;
+
+    const seeded = seedComments(articleId, 3);
+    const own = loadOwnComments(articleId);
+    const total = seeded.length + own.length;
+    if (countEl) countEl.textContent = String(total);
+
+    // The row's text lands via textContent in a second pass, never via
+    // innerHTML — a visitor's own comment must never be able to inject markup.
+    const row = (name, ageLabel, isYou) => `
+      <div class="comment-row${isYou ? ' is-you' : ''}">
+        <div class="comment-row__avatar">${esc(name.slice(0, 2).toUpperCase())}</div>
+        <div class="comment-row__body">
+          <div class="comment-row__head">
+            <span class="comment-row__name">${isYou ? t('comments.you') : esc(name)}</span>
+            <span class="comment-row__time">${esc(ageLabel)}</span>
+          </div>
+          <div class="comment-row__text"></div>
+        </div>
+      </div>`;
+
+    const all = seeded.map(c => ({ name: c.name, text: c.text, age: c.age + 'h', isYou: false }))
+      .concat(own.map(c => ({ name: t('comments.you'), text: c.text, age: t('comments.justNow'), isYou: true })));
+
+    host.innerHTML = all.map(c => row(c.name, c.age, c.isYou)).join('');
+    [...host.querySelectorAll('.comment-row__text')].forEach((el, i) => { el.textContent = all[i].text; });
+  }
+
+  function initCommentForm(articleId) {
+    const form = $('#comment-form');
+    const input = $('#comment-input');
+    if (!form || !input) return;
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      const own = loadOwnComments(articleId);
+      own.push({ text: text.slice(0, 500) });
+      saveOwnComments(articleId, own);
+      input.value = '';
+      renderComments(articleId);
+      Toast.show(t('comments.posted'), { icon: 'check' });
+    });
+  }
 
   function initReaction() {
     const pad = $('#reaction-pad');
@@ -1044,11 +1247,19 @@
     initSearch('#search-input-mobile', '#search-results-mobile');
 
     document.addEventListener('click', e => {
+      // Explicit guard rather than relying on stopPropagation() ordering:
+      // share/remind/bookmark buttons often sit inside a whole-card
+      // [data-route] link (the news hero, fixture rows), and two listeners
+      // on the same document node fire in registration order regardless of
+      // stopPropagation — only an explicit exclusion is order-independent.
+      if (e.target.closest('[data-share],[data-remind],[data-bookmark],[data-jump]')) return;
       const el = e.target.closest('[data-route]');
       if (!el) return;
       e.preventDefault();
       location.hash = el.dataset.route;
     });
+
+    wireSocialActions();
 
     $('#mobile-toggle').addEventListener('click', () => {
       const nav = $('#mobile-nav');

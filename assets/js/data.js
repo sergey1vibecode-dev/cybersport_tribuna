@@ -58,6 +58,7 @@ const TRIBUNA_DATA = {
      shader shifts hue as the carousel advances. */
   heroSlides: [
     {
+      id: 'ewc-navi-legacy',
       tag: T('LIVE NOW', 'ЗАРАЗ У ЕФІРІ', 'СЕЙЧАС В ЭФИРЕ'),
       live: true,
       event: 'EWC 2026 — CS2',
@@ -76,6 +77,7 @@ const TRIBUNA_DATA = {
       cta: T('WATCH LIVE', 'ДИВИТИСЬ', 'СМОТРЕТЬ')
     },
     {
+      id: 'ewc-b8-spirit',
       tag: T('GAME 3', 'ГРА 3', 'ИГРА 3'),
       live: true,
       event: 'EWC 2026 — CS2',
@@ -94,6 +96,7 @@ const TRIBUNA_DATA = {
       cta: T('WATCH LIVE', 'ДИВИТИСЬ', 'СМОТРЕТЬ')
     },
     {
+      id: 'warsaw-lan-derby',
       tag: T('STARTS IN', 'ПОЧАТОК ЧЕРЕЗ', 'НАЧАЛО ЧЕРЕЗ'),
       countdown: 134,
       live: false,
@@ -113,6 +116,7 @@ const TRIBUNA_DATA = {
       cta: T('SET REMINDER', 'НАГАДАТИ', 'НАПОМНИТЬ')
     },
     {
+      id: 'ti-2026-bracket',
       tag: T('THIS WEEKEND', 'ЦИХ ВИХІДНИХ', 'В ЭТИ ВЫХОДНЫЕ'),
       live: false,
       event: 'THE INTERNATIONAL 2026',
@@ -964,7 +968,7 @@ const TRIBUNA_DATA = {
   news: [
     {
       id: 'hle-lck-streak',
-      cat: 'LOL', tone: 'primary', read: 3, image: 'assets/img/crowd-screen.jpg',
+      cat: 'LOL', tone: 'primary', read: 3, comments: 58, image: 'assets/img/crowd-screen.jpg',
       age: T('6 HOURS AGO', '6 ГОДИН ТОМУ', '6 ЧАСОВ НАЗАД'),
       title: T('Hanwha Life take a fifth straight series and the LCK top seed',
                'Hanwha Life беруть п’яту серію поспіль і перше місце LCK',
@@ -988,7 +992,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'twisted-minds-pgs',
-      cat: 'PUBG', tone: 'tertiary', read: 3, image: 'assets/img/lan-event.jpg',
+      cat: 'PUBG', tone: 'tertiary', read: 3, comments: 71, image: 'assets/img/lan-event.jpg',
       age: T('10 HOURS AGO', '10 ГОДИН ТОМУ', '10 ЧАСОВ НАЗАД'),
       title: T('Twisted Minds lead PGS 5 on kill points alone',
                'Twisted Minds лідирують на PGS 5 самими лише очками за фраги',
@@ -1012,7 +1016,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'r1nkle-g2',
-      cat: 'CS2', tone: 'primary', read: 2, image: 'assets/img/player-station.jpg',
+      cat: 'CS2', tone: 'primary', read: 2, comments: 94, image: 'assets/img/player-station.jpg',
       age: T('2 HOURS AGO', '2 ГОДИНИ ТОМУ', '2 ЧАСА НАЗАД'),
       title: T('«We lacked aggression»: G2 coach explains the r1nkle transfer',
                '«Нам бракувало агресії»: тренер G2 пояснив трансфер українця r1nkle',
@@ -1039,7 +1043,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'passion-ua-debt',
-      cat: 'CS2', tone: 'secondary', read: 3, image: 'assets/img/stage-truss.jpg',
+      cat: 'CS2', tone: 'secondary', read: 3, comments: 246, image: 'assets/img/stage-truss.jpg',
       age: T('5 HOURS AGO', '5 ГОДИН ТОМУ', '5 ЧАСОВ НАЗАД'),
       title: T('Passion UA on the brink: debt to the CS roster reaches $600K',
                'Passion UA на межі ліквідації: борг перед CS-складом сягає $600K',
@@ -1063,7 +1067,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'ewc-playoff-pairs',
-      cat: 'CS2', tone: 'tertiary', read: 2, image: 'assets/img/stage-arena-main.jpg',
+      cat: 'CS2', tone: 'tertiary', read: 2, comments: 187, image: 'assets/img/stage-arena-main.jpg',
       age: T('7 HOURS AGO', '7 ГОДИН ТОМУ', '7 ЧАСОВ НАЗАД'),
       title: T('EWC 2026 playoff pairs set: who NAVI and B8 face',
                'Визначилися пари 1/8 фіналу EWC 2026 з CS2: з ким зіграють NAVI та B8',
@@ -1087,7 +1091,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'kassad-favourites',
-      cat: 'CS2', tone: 'primary', read: 2, image: 'assets/img/player-headset.jpg',
+      cat: 'CS2', tone: 'primary', read: 2, comments: 132, image: 'assets/img/player-headset.jpg',
       age: T('9 HOURS AGO', '9 ГОДИН ТОМУ', '9 ЧАСОВ НАЗАД'),
       title: T('Analyst names his EWC 2026 favourites: «Falcons are number one»',
                'Аналітик назвав головних фаворитів EWC 2026 з CS2: «Falcons — номер один»',
@@ -1114,7 +1118,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'furia-fe-valorant',
-      cat: 'VALORANT', tone: 'primary', read: 3, image: 'assets/img/lan-event.jpg',
+      cat: 'VALORANT', tone: 'primary', read: 3, comments: 89, image: 'assets/img/lan-event.jpg',
       age: T('12 HOURS AGO', '12 ГОДИН ТОМУ', '12 ЧАСОВ НАЗАД'),
       title: T('FURIA fe move to VALORANT: women\'s CS2 in deep crisis',
                'FURIA fe переходить у VALORANT: жіночий CS2 у глибокій кризі',
@@ -1138,7 +1142,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'ti-2026-playoff',
-      cat: 'DOTA 2', tone: 'tertiary', read: 2, image: 'assets/img/stage-arena-packed.jpg',
+      cat: 'DOTA 2', tone: 'tertiary', read: 2, comments: 203, image: 'assets/img/stage-arena-packed.jpg',
       age: T('1 DAY AGO', '1 ДЕНЬ ТОМУ', '1 ДЕНЬ НАЗАД'),
       title: T('The International 2026 has its full playoff field',
                'The International 2026 визначив усі команди плей-оф',
@@ -1162,7 +1166,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'mobile-legends-worlds',
-      cat: 'ІНШЕ', tone: 'secondary', read: 2, image: 'assets/img/crowd-screen.jpg',
+      cat: 'ІНШЕ', tone: 'secondary', read: 2, comments: 47, image: 'assets/img/crowd-screen.jpg',
       age: T('1 DAY AGO', '1 ДЕНЬ ТОМУ', '1 ДЕНЬ НАЗАД'),
       title: T('Ukraine qualify for the 2026 Mobile Legends World Championship',
                'Україна пробилася на чемпіонат світу 2026 з Mobile Legends',
@@ -1186,7 +1190,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'nations-cup-2027',
-      cat: 'ІНШЕ', tone: 'secondary', read: 2, image: 'assets/img/stage-truss.jpg',
+      cat: 'ІНШЕ', tone: 'secondary', read: 2, comments: 61, image: 'assets/img/stage-truss.jpg',
       age: T('2 DAYS AGO', '2 ДНІ ТОМУ', '2 ДНЯ НАЗАД'),
       title: T('The debut Esports Nations Cup pushed from 2026 to 2027',
                'Дебютний Esports Nations Cup перенесли з 2026 на 2027 рік',
@@ -1210,7 +1214,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'b8-warsaw-lan',
-      cat: 'CS2', tone: 'tertiary', read: 2, image: 'assets/img/setup-neon.jpg',
+      cat: 'CS2', tone: 'tertiary', read: 2, comments: 76, image: 'assets/img/setup-neon.jpg',
       age: T('2 DAYS AGO', '2 ДНІ ТОМУ', '2 ДНЯ НАЗАД'),
       title: T('B8 and Inner Circle to play a Warsaw LAN',
                'B8 та Inner Circle зіграють на LAN-турнірі з CS2 у Варшаві',
@@ -1234,7 +1238,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'dota-salaries',
-      cat: 'DOTA 2', tone: 'primary', read: 4, image: 'assets/img/setup-purple.jpg',
+      cat: 'DOTA 2', tone: 'primary', read: 4, comments: 118, image: 'assets/img/setup-purple.jpg',
       age: T('3 DAYS AGO', '3 ДНІ ТОМУ', '3 ДНЯ НАЗАД'),
       title: T('How Dota 2 salaries have changed: a veteran\'s assessment',
                'Як змінилися зарплати у Dota 2: оцінка від ветерана сцени',
@@ -1264,7 +1268,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'bestia-nacho',
-      cat: 'CS2', tone: 'primary', read: 2, image: 'assets/img/gear-keyboard.jpg',
+      cat: 'CS2', tone: 'primary', read: 2, comments: 39, image: 'assets/img/gear-keyboard.jpg',
       age: T('3 DAYS AGO', '3 ДНІ ТОМУ', '3 ДНЯ НАЗАД'),
       title: T('BESTIA bench nacho over «a change of roles in the team»',
                'BESTIA перевела nacho в запас через «зміну ролей у команді»',
@@ -1288,7 +1292,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 's1mple-ten-years',
-      cat: 'CS2', tone: 'tertiary', read: 5, image: 'assets/img/stage-beams.jpg',
+      cat: 'CS2', tone: 'tertiary', read: 5, comments: 264, image: 'assets/img/stage-beams.jpg',
       age: T('4 DAYS AGO', '4 ДНІ ТОМУ', '4 ДНЯ НАЗАД'),
       title: T('The transfer that changed CS: ten years since s1mple joined NAVI',
                'Трансфер, що змінив CS: 10 років з моменту переходу s1mple в NAVI',
@@ -1386,5 +1390,53 @@ const TRIBUNA_DATA = {
     { name: T('a pro CS2 player', 'про-гравця CS2', 'про-игрока CS2'), ms: 150 },
     { name: T('the average gamer', 'середнього гравця', 'среднего игрока'), ms: 215 },
     { name: T('the average human', 'середню людину', 'среднего человека'), ms: 273 }
-  ]
+  ],
+
+  /* Discipline search aliases. `tm.game` / `n.cat` are stored as the Latin
+     tag ("CS2", "PUBG", ...) used throughout the UI, so a Cyrillic query like
+     "лол" or "дота" never matched it via plain substring search. This maps
+     every discipline to the spellings people actually type, Cyrillic included,
+     so the search bar works the same for team and news results either way. */
+  disciplineAliases: {
+    'CS2':      ['cs2', 'cs', 'кс2', 'кс', 'контра', 'контр-страйк', 'каунтер страйк', 'counter-strike'],
+    'DOTA 2':   ['dota', 'dota2', 'dota 2', 'дота', 'дота2', 'дота 2', 'дотка'],
+    'VALORANT': ['valorant', 'вал', 'валорант'],
+    'LOL':      ['lol', 'лол', 'league of legends', 'ліга легенд', 'лига легенд'],
+    'PUBG':     ['pubg', 'пабг', 'пубг', 'пубг мобайл', 'пабгі']
+  },
+
+  /* Seed comments for article pages — same honest pattern as the stream chat:
+     a small deterministic set of plausible fan reactions (picked per article
+     from its id, so the same article shows the same seed thread on every
+     visit) that a visitor's own comment is appended to and kept in
+     localStorage. Discipline-agnostic on purpose, so the same pool works
+     under a transfer story or a bracket story alike. */
+  commenters: [
+    'xX_Sniper_Xx', 'FazeFan99', 'CS2_God', 'kyiv_clutch', 'awp_enjoyer',
+    'tacticalTim', 'zeroPing', 'na_vi_or_die', 'silent_igl', 'benched_analyst'
+  ],
+
+  commentLines: T(
+    ['Called this two weeks ago.', 'Source on this or is it just vibes?',
+     'W move honestly.', 'Not surprised at all.', 'This changes a lot.',
+     'Been saying this for months.', 'Rough read but fair.',
+     'Here for the reaction thread, not disappointed.', 'Bout time.',
+     'Bold. Let\'s see how it plays out.', 'Screenshotting this for later.',
+     'The comments here are wild today.', 'Finally some real talk.',
+     'Respectfully, disagree.'],
+    ['Про це говорили ще два тижні тому.', 'Джерело є чи це просто відчуття?',
+     'Сильний хід, чесно.', 'Не здивований.', 'Це багато що змінює.',
+     'Кажу це вже кілька місяців.', 'Жорстко, але справедливо.',
+     'Прийшов заради коментарів, не розчарований.', 'Давно пора.',
+     'Сміливо. Подивимось, що з цього вийде.', 'Зберігаю скрін на потім.',
+     'Коментарі сьогодні просто вогонь.', 'Нарешті хтось каже прямо.',
+     'При всій повазі, не згоден.'],
+    ['Об этом говорили ещё две недели назад.', 'Источник есть или это просто ощущения?',
+     'Сильный ход, чесно говоря.', 'Не удивлён.', 'Это многое меняет.',
+     'Говорю это уже который месяц.', 'Жёстко, но справедливо.',
+     'Пришёл ради комментариев, не разочарован.', 'Давно пора.',
+     'Смело. Посмотрим, что из этого выйдет.', 'Сохраняю скрин на потом.',
+     'Комментарии сегодня просто огонь.', 'Наконец кто-то говорит прямо.',
+     'При всём уважении, не согласен.']
+  )
 };

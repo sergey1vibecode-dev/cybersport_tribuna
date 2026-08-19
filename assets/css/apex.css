@@ -21,6 +21,7 @@
   /* Text */
   --on-surface:        #e2e2e9;
   --on-surface-var:    #cdc3d0;
+  --outline:           #968e99;
   --outline-variant:   #4b444f;
 
   /* Effects */
@@ -56,8 +57,24 @@ html { scroll-behavior: smooth; }
    collapsing into itself. */
 h1, h2, h3, h4, h5 { line-height: 1.08; }
 
+/* Background lives on `body` itself, not on separate `position:fixed` divs.
+   Fixed-position overlays are pinned to the viewport rather than the page, so
+   on anything taller than one screen they read as a patch that stays put while
+   content scrolls past it — never reaching the bottom, and appearing to
+   "follow"/move independently of the page. A normal `background` on `body`
+   uses the default `scroll` attachment: it is sized to the full rendered
+   height of the document (whatever that turns out to be, on any page), scrolls
+   together with the content like everything else, and needs no JS to stay
+   in sync. The noise layer tiles, so it repeats seamlessly for the entire
+   length of the page rather than stopping at some fixed pixel height. */
 body {
   background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 1200px 640px at 50% 0, rgba(168, 85, 247, 0.16), transparent 70%),
+    radial-gradient(ellipse 1600px 900px at 50% 0, #1a0b2e 0%, transparent 60%),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-position: top center, top center, top left;
   color: var(--on-surface);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -88,33 +105,10 @@ body {
    Ambient background — one shared treatment across every view
    -------------------------------------------------------------------------- */
 
-.ambient-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: radial-gradient(circle at 50% 0%, #1a0b2e 0%, var(--void) 55%);
-  pointer-events: none;
-}
-.ambient-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.5;
-  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
-}
-
-/* Soft purple bloom that used to live only on the News screen */
-.bg-glow {
-  position: fixed;
-  top: 18%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vh;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.10) 0%, rgba(11, 13, 18, 0) 70%);
-  pointer-events: none;
-  z-index: -1;
-}
+/* .ambient-bg and .bg-glow retired — see the `body` background rule above.
+   The classes are kept as harmless no-ops in case anything still references
+   them, but the markup no longer inserts the divs. */
+.ambient-bg, .bg-glow { display: none; }
 
 /* --------------------------------------------------------------------------
    Glass & elevation
@@ -230,7 +224,7 @@ body {
    -------------------------------------------------------------------------- */
 
 .ticker-wrap { width: 100%; overflow: hidden; box-sizing: border-box; }
-.ticker { display: inline-block; white-space: nowrap; padding-right: 100%; animation: ticker 40s linear infinite; }
+.ticker { display: inline-block; white-space: nowrap; padding-right: 100%; animation: ticker 75s linear infinite; }
 .ticker__item { display: inline-block; padding: 0 2rem; }
 .ticker-wrap:hover .ticker { animation-play-state: paused; }
 @keyframes ticker {
@@ -1017,3 +1011,132 @@ body {
   .hero-parallax { transform: none !important; }
   .live-pulse, .animate-pulse-fast { animation: none !important; }
 }
+
+/* ==========================================================================
+   Toast — confirmation strip for actions with no other visible feedback
+   ========================================================================== */
+
+#toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(12, 14, 19, 0.96);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(168, 85, 247, 0.15);
+  color: var(--on-surface);
+  font-family: 'Hanken Grotesk', 'Inter', sans-serif;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+}
+.toast .material-symbols-outlined { color: var(--electric-soft); }
+.toast.is-in  { opacity: 1; transform: translateY(0) scale(1); }
+.toast.is-out { opacity: 0; transform: translateY(6px) scale(0.98); }
+
+@media (max-width: 480px) {
+  #toast-stack { bottom: 18px; left: 16px; right: 16px; transform: none; align-items: stretch; }
+  .toast { white-space: normal; }
+}
+
+/* -------------------------------------------------------------- reminder --
+   Small icon-only toggle used on hero CTAs and fixture rows. Filled + glowing
+   once armed, so the state reads at a glance without needing to re-read text. */
+
+.reminder-bell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: var(--outline);
+  transition: color var(--dur-hover) ease, background-color var(--dur-hover) ease, transform var(--dur-press) ease;
+  flex-shrink: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .reminder-bell:hover { color: var(--electric-soft); background: rgba(168, 85, 247, 0.12); }
+}
+.reminder-bell:active { transform: scale(0.9); }
+.reminder-bell.is-armed {
+  color: var(--electric-soft);
+  text-shadow: 0 0 12px var(--glow);
+}
+.reminder-bell.is-armed .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+
+/* ------------------------------------------------------------- bookmark --
+   Same on/off language as the reminder bell, used for "save article". */
+
+.bookmark-toggle { transition: color var(--dur-hover) ease, transform var(--dur-press) ease; }
+.bookmark-toggle:active { transform: scale(0.9); }
+.bookmark-toggle.is-saved {
+  color: var(--electric-soft) !important;
+  font-variation-settings: 'FILL' 1;
+}
+
+/* --------------------------------------------------------------- comments --
+   Seeded (deterministic) fan reactions plus whatever the visitor adds locally
+   — same honest pattern as the stream chat: real interaction, no fake backend. */
+
+.comment-row { display: flex; gap: 14px; padding: 16px 0; border-top: 1px solid var(--border-subtle); }
+.comment-row:first-child { border-top: none; }
+.comment-row__avatar {
+  width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--surface-charcoal);
+  border: 1px solid var(--border-subtle);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700;
+  color: var(--electric-soft);
+}
+.comment-row.is-you .comment-row__avatar { background: var(--electric); color: #fff; border-color: transparent; }
+.comment-row__body { min-width: 0; flex: 1; }
+.comment-row__head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.comment-row__name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--on-surface); }
+.comment-row__time { font-size: 11px; color: var(--outline); }
+.comment-row__text { font-size: 14px; line-height: 1.6; color: var(--on-surface-var); word-break: break-word; }
+
+.comment-form { display: flex; gap: 10px; margin-top: 8px; }
+.comment-form input {
+  flex: 1;
+  background: var(--void);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 11px 18px;
+  color: var(--on-surface);
+  font-size: 14px;
+  transition: border-color var(--dur-hover) ease;
+}
+.comment-form input:focus { outline: none; border-color: var(--electric); }
+.comment-form input::placeholder { color: var(--outline); }
+.comment-form button {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--electric);
+  color: #fff;
+  transition: transform var(--dur-press) ease, box-shadow var(--dur-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .comment-form button:hover { box-shadow: 0 0 20px var(--glow); }
+}
+.comment-form button:active { transform: scale(0.94); }

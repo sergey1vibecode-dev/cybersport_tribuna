@@ -54,9 +54,15 @@ window.ApexHero = (function () {
                    further down the page, so a second button here only competed
                    with the one action the slide is actually about. -->
               <div class="flex gap-4">
+                ${s.countdown != null ? `
+                <button class="btn-primary clip-corner font-label-caps text-label-caps px-8 py-4 flex items-center gap-2${window.Prefs && Prefs.isSet('reminder.' + s.id) ? ' is-armed' : ''}"
+                        data-remind="reminder.${s.id}" aria-pressed="${window.Prefs && Prefs.isSet('reminder.' + s.id) ? 'true' : 'false'}">
+                  <span class="material-symbols-outlined text-[18px]">notifications</span>
+                  <span data-remind-label>${window.Prefs && Prefs.isSet('reminder.' + s.id) ? I18N.t('common.reminderSet') : p(s.cta)}</span>
+                </button>` : `
                 <button class="btn-primary clip-corner font-label-caps text-label-caps px-8 py-4 flex items-center gap-2" data-route="#/live">
                   <span class="material-symbols-outlined text-[18px]">${s.live ? 'play_arrow' : 'notifications'}</span>${p(s.cta)}
-                </button>
+                </button>`}
               </div>
               <div class="flex gap-8 border-l border-border-subtle pl-8">
                 ${s.meta.map(m => `

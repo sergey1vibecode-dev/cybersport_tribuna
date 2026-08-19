@@ -25,7 +25,15 @@ window.I18N = (function () {
     'common.search':      { uk: 'Пошук команд…', ru: 'Поиск команд…',  en: 'Search teams…' },
     'common.viewAll':     { uk: 'ВСІ',           ru: 'ВСЕ',            en: 'VIEW ALL' },
     'common.share':       { uk: 'ПОДІЛИТИСЬ',    ru: 'ПОДЕЛИТЬСЯ',     en: 'SHARE' },
+    'common.shared':      { uk: 'НАДІСЛАНО',     ru: 'ОТПРАВЛЕНО',     en: 'SHARED' },
+    'common.linkCopied':  { uk: 'Посилання скопійовано', ru: 'Ссылка скопирована', en: 'Link copied' },
     'common.comments':    { uk: 'КОМЕНТАРІВ',    ru: 'КОММЕНТАРИЕВ',   en: 'COMMENTS' },
+    'common.remind':      { uk: 'Нагадати',      ru: 'Напомнить',      en: 'Remind me' },
+    'common.reminderSet': { uk: 'Нагадаємо перед матчем', ru: 'Напомним перед матчем', en: 'We\'ll remind you before the match' },
+    'common.reminderOff': { uk: 'Нагадування вимкнено', ru: 'Напоминание отключено', en: 'Reminder cancelled' },
+    'common.save':        { uk: 'Зберегти',      ru: 'Сохранить',      en: 'Save' },
+    'common.saved':       { uk: 'Збережено в закладки', ru: 'Сохранено в закладки', en: 'Saved to bookmarks' },
+    'common.unsaved':     { uk: 'Прибрано із закладок', ru: 'Убрано из закладок', en: 'Removed from bookmarks' },
     'common.back':        { uk: 'НАЗАД',         ru: 'НАЗАД',          en: 'BACK' },
     'common.noResults':   { uk: 'Нічого не знайдено', ru: 'Ничего не найдено', en: 'Nothing found' },
     'common.vs':          { uk: 'ПРОТИ',         ru: 'ПРОТИВ',         en: 'VS' },
@@ -112,13 +120,21 @@ window.I18N = (function () {
     /* ------------------------------------------------------------ news */
     'news.latest':        { uk: 'ОСТАННІ ОНОВЛЕННЯ', ru: 'ПОСЛЕДНИЕ ОБНОВЛЕНИЯ', en: 'LATEST UPDATES' },
     'news.all':           { uk: 'УСІ',            ru: 'ВСЕ',             en: 'ALL' },
-    'news.breaking':      { uk: 'ТЕРМІНОВО',      ru: 'СРОЧНО',          en: 'BREAKING NEWS' },
+    'news.breaking':      { uk: 'ІНСАЙД ДНЯ',     ru: 'ИНСАЙД ДНЯ',      en: 'INSIGHT OF THE DAY' },
     'news.readMore':      { uk: 'ЧИТАТИ ДАЛІ',    ru: 'ЧИТАТЬ ДАЛЬШЕ',   en: 'READ MORE' },
     'news.back':          { uk: 'ДО ВСІХ НОВИН',  ru: 'КО ВСЕМ НОВОСТЯМ', en: 'ALL NEWS' },
     'news.related':       { uk: 'ЧИТАЙТЕ ТАКОЖ',  ru: 'ЧИТАЙТЕ ТАКЖЕ',   en: 'RELATED' },
     'news.loadMore':      { uk: 'ЩЕ НОВИНИ',      ru: 'ЕЩЁ НОВОСТИ',     en: 'LOAD MORE NEWS' },
     'news.minRead':       { uk: 'хв читання',     ru: 'мин чтения',      en: 'min read' },
     'news.notFound':      { uk: 'Новину не знайдено', ru: 'Новость не найдена', en: 'Article not found' },
+
+    /* --------------------------------------------------------- comments */
+    'comments.title':       { uk: 'КОМЕНТАРІ',           ru: 'КОММЕНТАРИИ',          en: 'COMMENTS' },
+    'comments.placeholder': { uk: 'Ваш коментар…',       ru: 'Ваш комментарий…',     en: 'Your comment…' },
+    'comments.you':         { uk: 'ви',                  ru: 'вы',                   en: 'you' },
+    'comments.posted':      { uk: 'Коментар опубліковано', ru: 'Комментарий опубликован', en: 'Comment posted' },
+    'comments.justNow':     { uk: 'щойно',                ru: 'только что',           en: 'just now' },
+    'comments.send':         { uk: 'Надіслати',           ru: 'Отправить',            en: 'Send' },
     /* Categories are disciplines, the way a sports desk actually files esports
        copy — a reader looks for "CS2", not for "transfers". */
     'cat.CS2':            { uk: 'CS2',            ru: 'CS2',             en: 'CS2' },
