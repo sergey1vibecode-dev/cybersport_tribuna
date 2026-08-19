@@ -903,6 +903,10 @@ body {
    animated — clip-path costs no layout. */
 
 #mobile-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   overflow: hidden;
   transform-origin: top center;
 }
