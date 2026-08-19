@@ -117,7 +117,7 @@ const TRIBUNA_DATA = {
     },
     {
       id: 'ti-2026-bracket',
-      tag: T('THIS WEEKEND', 'ЦИХ ВИХІДНИХ', 'В ЭТИ ВЫХОДНЫЕ'),
+      tag: T('THIS WEEKEND', 'НА ЦИХ ВИХІДНИХ', 'В ЭТИ ВЫХОДНЫЕ'),
       live: false,
       event: 'THE INTERNATIONAL 2026',
       title: T('SIXTEEN REMAIN', 'ЛИШИЛОСЬ ШІСТНАДЦЯТЬ', 'ОСТАЛОСЬ ШЕСТНАДЦАТЬ'),
