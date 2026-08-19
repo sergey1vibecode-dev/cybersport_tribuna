@@ -840,57 +840,73 @@
     let phase = 'idle';
     let timeout = 0;
     let goAt = 0;
+    let lastMs = 0;              // kept so a language change can repaint the result
 
     const best = () => { try { return Number(localStorage.getItem(KEY)) || 0; } catch (e) { return 0; } };
     const paintBest = () => { bestEl.textContent = best() ? best() + ' ' + t('arena.ms') : '—'; };
 
-    function arm() {
-      phase = 'armed';
-      pad.className = BASE + ' is-armed';
-      label.textContent = t('arena.waitPurple');
-      sub.textContent = t('arena.waitSub');
-      timeout = setTimeout(() => {
-        phase = 'go';
-        goAt = performance.now();
+    /* Single place that turns state into text, so a language change just
+       calls it again instead of leaving half the pad in the old language. */
+    function paintPad() {
+      if (phase === 'idle') {
+        pad.className = BASE;
+        label.textContent = t('arena.clickToStart');
+        sub.textContent = '';
+      } else if (phase === 'armed') {
+        pad.className = BASE + ' is-armed';
+        label.textContent = t('arena.waitPurple');
+        sub.textContent = t('arena.waitSub');
+      } else if (phase === 'go') {
         pad.className = BASE + ' is-go';
         label.textContent = t('arena.clickNow');
         sub.textContent = '';
+      } else if (phase === 'foul') {
+        pad.className = BASE + ' is-foul';
+        label.textContent = t('arena.tooEarly');
+        sub.textContent = t('arena.foulSub');
+      } else if (phase === 'done') {
+        pad.className = BASE;
+        label.textContent = lastMs + ' ' + t('arena.ms');
+        const beaten = D.proBenchmarks.filter(b => lastMs < b.ms);
+        sub.textContent = beaten.length
+          ? t('arena.fasterThan') + ' ' + beaten.map(b => p(b.name)).join(', ') + '. ' + t('arena.retry')
+          : t('arena.slowerThan') + ' ' + t('arena.retry');
+      }
+    }
+
+    function arm() {
+      phase = 'armed';
+      paintPad();
+      timeout = setTimeout(() => {
+        phase = 'go';
+        goAt = performance.now();
+        paintPad();
       }, 1400 + Math.random() * 3600);
     }
 
     pad.addEventListener('click', () => {
-      if (phase === 'idle' || phase === 'done') { arm(); return; }
+      if (phase === 'idle' || phase === 'done' || phase === 'foul') { arm(); return; }
 
       if (phase === 'armed') {
         clearTimeout(timeout);
-        phase = 'done';
-        pad.className = BASE + ' is-foul';
-        label.textContent = t('arena.tooEarly');
-        sub.textContent = t('arena.foulSub');
+        phase = 'foul';
+        paintPad();
         return;
       }
 
       if (phase === 'go') {
-        const ms = Math.round(performance.now() - goAt);
+        lastMs = Math.round(performance.now() - goAt);
         phase = 'done';
-        pad.className = BASE;
-        label.textContent = ms + ' ' + t('arena.ms');
-        const beaten = D.proBenchmarks.filter(b => ms < b.ms);
-        sub.textContent = beaten.length
-          ? t('arena.fasterThan') + ' ' + beaten.map(b => p(b.name)).join(', ') + '. ' + t('arena.retry')
-          : t('arena.slowerThan') + ' ' + t('arena.retry');
-        if (!best() || ms < best()) {
-          try { localStorage.setItem(KEY, String(ms)); } catch (e) { /* private mode */ }
+        paintPad();
+        if (!best() || lastMs < best()) {
+          try { localStorage.setItem(KEY, String(lastMs)); } catch (e) { /* private mode */ }
         }
         paintBest();
       }
     });
 
     paintBest();
-    I18N.onChange(() => {
-      paintBest();
-      if (phase === 'idle') label.textContent = t('arena.clickToStart');
-    });
+    I18N.onChange(() => { paintBest(); paintPad(); });
   }
 
   /* ====================================================================== */
@@ -1052,6 +1068,7 @@
 
     // Re-render data-driven markup on every language change.
     I18N.onChange(() => {
+      if (arena && arena.relabel) arena.relabel();
       maskLanguageSwap(() => {
         if (hero) { hero.destroy(); hero = ApexHero.create($('#hero'), shader); }
         renderAll();

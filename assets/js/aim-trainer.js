@@ -121,6 +121,7 @@ window.AimArena = (function () {
       countdownFrom: 0,
       lastTickSecond: -1,
       pointer: { x: -999, y: -999, inside: false },
+      lastRun: null,          // kept so relabel() can rebuild the results screen
       raf: 0,
       w: 0, h: 0, dpr: 1
     };
@@ -500,6 +501,22 @@ window.AimArena = (function () {
       if (isBest) writeBest({ score: state.score, rank: rank.name, acc: acc, at: Date.now() });
       paintBest();
 
+      state.lastRun = {
+        score: state.score, hits: state.hits, acc: acc,
+        hs: hsRate(), bestCombo: state.bestCombo, isBest: isBest
+      };
+      paintResults();
+      el.results.hidden = false;
+    }
+
+    /* Builds the results overlay from the stored run. Split out from finish()
+       so a language change can rebuild it without replaying the round. */
+    function paintResults() {
+      const r = state.lastRun;
+      if (!r) return;
+      const rank = rankFor(r.score);
+      const isBest = r.isBest;
+
       el.resultIn.innerHTML = [
         '<div class="flex flex-col items-center text-center px-8 py-10">',
         isBest
@@ -508,13 +525,13 @@ window.AimArena = (function () {
         '<div class="rank-badge mb-6" style="color:' + rank.color + '">',
         '  <span class="font-headline-md text-[20px] leading-none">' + rank.name + '</span>',
         '</div>',
-        '<div class="font-display-xl text-[64px] leading-none text-on-surface mb-2">' + state.score + '</div>',
+        '<div class="font-display-xl text-[64px] leading-none text-on-surface mb-2">' + r.score + '</div>',
         '<p class="font-body-md text-on-surface-variant mb-8 max-w-sm">' + I18N.pick(rank.note) + '</p>',
         '<div class="grid grid-cols-4 gap-3 mb-8 w-full max-w-lg">',
-        statCell(I18N.t('arena.hits'), state.hits),
-        statCell(I18N.t('arena.accuracy'), acc + '%'),
-        statCell(I18N.t('arena.headshot'), hsRate() + '%'),
-        statCell(I18N.t('arena.bestCombo'), 'x' + state.bestCombo),
+        statCell(I18N.t('arena.hits'), r.hits),
+        statCell(I18N.t('arena.accuracy'), r.acc + '%'),
+        statCell(I18N.t('arena.headshot'), r.hs + '%'),
+        statCell(I18N.t('arena.bestCombo'), 'x' + r.bestCombo),
         '</div>',
         '<div class="flex gap-4">',
         '  <button data-aim-action="again" class="btn-primary clip-corner font-label-caps text-label-caps px-8 py-3">' + I18N.t('arena.again') + '</button>',
@@ -522,8 +539,6 @@ window.AimArena = (function () {
         '</div>',
         '</div>'
       ].join('');
-
-      el.results.hidden = false;
 
       el.resultIn.querySelectorAll('[data-aim-action="again"]').forEach(b => b.addEventListener('click', start));
       el.resultIn.querySelectorAll('[data-aim-action="close"]').forEach(b => b.addEventListener('click', () => {
@@ -584,7 +599,13 @@ window.AimArena = (function () {
     paintHud();
     resize();
 
-    return { start, stop, resize };
+    /* Re-renders every string this module owns, for a language change. */
+    function relabel() {
+      paintBest();
+      if (!el.results.hidden) paintResults();
+    }
+
+    return { start, stop, resize, relabel };
   }
 
   return { create };
