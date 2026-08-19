@@ -37,6 +37,7 @@ window.I18N = (function () {
     'common.back':        { uk: 'НАЗАД',         ru: 'НАЗАД',          en: 'BACK' },
     'common.noResults':   { uk: 'Нічого не знайдено', ru: 'Ничего не найдено', en: 'Nothing found' },
     'common.vs':          { uk: 'ПРОТИ',         ru: 'ПРОТИВ',         en: 'VS' },
+    'common.started':     { uk: 'ВЖЕ ЙДЕ',       ru: 'УЖЕ ИДЁТ',       en: 'STARTED' },
 
     /* ------------------------------------------------------------ home */
     'home.liveNow':       { uk: 'ЗАРАЗ У ЕФІРІ',   ru: 'СЕЙЧАС В ЭФИРЕ',  en: 'LIVE NOW' },

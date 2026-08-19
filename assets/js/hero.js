@@ -31,8 +31,8 @@ window.ApexHero = (function () {
           <div class="hero-slide__content max-w-3xl">
 
             <div class="flex items-center gap-4 mb-6">
-              <span class="flex items-center gap-2 ${s.live ? 'bg-live text-black live-pulse' : 'bg-glass-highlight text-on-surface border border-border-subtle'} font-label-caps text-[12px] px-3 py-1.5 rounded-full">
-                ${s.live ? '<span class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${p(s.tag)}${s.countdown ? ' <span class="font-stat-value" data-countdown="' + i + '">--:--</span>' : ''}
+              <span class="flex items-center gap-2 ${s.live ? 'bg-live text-black live-pulse' : 'bg-glass-highlight text-on-surface border border-border-subtle'} font-label-caps text-[12px] px-3 py-1.5 rounded-full" data-badge="${i}">
+                ${s.live ? '<span class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}<span data-badge-label>${p(s.tag)}</span>${s.countdown ? ' <span class="font-stat-value" data-countdown="' + i + '">--:--</span>' : ''}
               </span>
               <span class="font-label-caps text-label-caps text-on-surface-variant">${s.event}</span>
             </div>
@@ -144,7 +144,16 @@ window.ApexHero = (function () {
       clocks.forEach(c => {
         const el = track.querySelector('[data-countdown="' + c.i + '"]');
         if (!el) return;
-        if (c.left <= 0) { el.textContent = 'NOW'; return; }
+        if (c.left <= 0) {
+          const badge = track.querySelector('[data-badge="' + c.i + '"]');
+          if (badge && !badge.dataset.started) {
+            badge.dataset.started = '1';
+            badge.classList.add('bg-live', 'text-black', 'live-pulse');
+            badge.classList.remove('bg-glass-highlight', 'text-on-surface', 'border', 'border-border-subtle');
+            badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-black"></span><span data-badge-label>' + I18N.t('common.started') + '</span>';
+          }
+          return;
+        }
         c.left--;
         const m = String(Math.floor(c.left / 60)).padStart(2, '0');
         const sec = String(c.left % 60).padStart(2, '0');
